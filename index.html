@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>My Garage v3.1 — Gestió de vehicles</title>
+<title>My Garage v3.2 — Gestió de vehicles</title>
 <meta name="description" content="App personal de manteniment de vehicles amb Google Drive">
 <meta name="theme-color" content="#1A1208">
 
@@ -261,7 +261,7 @@ window.onerror = function(msg, src, line, col, err) {
     <div id="login-error" class="login-error" style="display:none"></div>
 
     <div class="login-config">
-      Versió 3.1 · Dades privades i segures al teu Google Drive
+      Versió 3.2 · Dades privades i segures al teu Google Drive
     </div>
     <div id="debug-info" style="margin-top:10px; font-family:monospace; font-size:9px; color:rgba(156,138,106,.3); display:none;"></div>
   </div>
@@ -1993,7 +1993,7 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
 
   function newConversation() {
     const id = Date.now().toString();
-    const conv = { id, title: "Nova conversa", msgs: [{ role: "bot", text: "Hola! En que et puc ajudar amb el teu " + ((vehicle && vehicle.name) || "vehicle") + "?", time: new Date().toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }) }], history: [], createdAt: new Date().toISOString() };
+    const conv = { id, title: "Nova conversa", msgs: [{ role: "bot", text: "Hola! En que et puc ajudar amb el teu " + ((vehicle && vehicle.name) || "vehicle") + "?", time: (() => { const n = new Date(); return n.toLocaleDateString("ca-ES", {day:"2-digit",month:"2-digit"}) + " " + n.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }); })() }], history: [], createdAt: new Date().toISOString() };
     const newConvs = [conv, ...conversations];
     setConversations(newConvs);
     setActiveConvId(id);
@@ -2035,7 +2035,7 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
       const newFiles = [...files.filter(f => f.label !== uploadLabel), newFile];
       setFiles(newFiles);
       saveState(undefined, newFiles, undefined);
-      const confirmMsg = { role: "bot", text: "✅ " + uploadLabel + " pujat (" + newFile.sizeMB + " MB). Permanent a Mistral.", time: new Date().toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }) };
+      const confirmMsg = { role: "bot", text: "✅ " + uploadLabel + " pujat (" + newFile.sizeMB + " MB). Permanent a Mistral.", time: (() => { const n = new Date(); return n.toLocaleDateString("ca-ES", {day:"2-digit",month:"2-digit"}) + " " + n.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }); })() };
       updateActiveConv([...msgs, confirmMsg]);
       setShowUpload(false);
     } catch(e) { setUploadError("Error: " + e.message); }
@@ -2046,7 +2046,7 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
     const t = (text || input).trim();
     if (!t || !activeConvId) return;
     setInput("");
-    const time = new Date().toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" });
+    const time = (() => { const n = new Date(); return n.toLocaleDateString("ca-ES", {day:"2-digit",month:"2-digit"}) + " " + n.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }); })();
     const newMsgs = [...msgs, { role: "user", text: t, time }];
     const isFirstMsg = msgs.filter(m => m.role === "user").length === 0;
     const newTitle = isFirstMsg ? t.slice(0, 40) : undefined;
@@ -2059,8 +2059,9 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
       const sysPrompt = ["Ets un expert mecanico especialista en " + (vehicle.name || theme.name) + ".", "Respon sempre en catala. Sigues precis i cita el numero de pagina quan puguis.", "Vehicle: " + (vehicle.name || "") + " | Any: " + (vehicle.year || "") + " | Motor: " + (vehicle.engine || "") + " | Km: " + km.toLocaleString(), dossier ? "Notes del propietari: " + dossier : "", ivSummary ? "Ultimes intervencions: " + ivSummary : "", files.length > 0 ? "Tens acces als documents tecnics. Consulta sempre els PDFs adjunts." : ""].filter(Boolean).join("\n");
       const histMessages = history.slice(-6).map(h => ({ role: h.role === "bot" ? "assistant" : "user", content: h.content }));
       const userContent = [];
-      for (const f of files) {
-        // Handle both old format (driveFileId) and new format (fileId)
+      // Send max 2 files per request to avoid context length limits
+      const filesToSend = files.slice(0, 2);
+      for (const f of filesToSend) {
         const mistralFileId = f.fileId || f.mistralFileId;
         if (!mistralFileId) { console.warn("File missing fileId:", f.label); continue; }
         try {
@@ -2069,8 +2070,9 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
           else { console.warn("Could not get signed URL for", f.label, "status:", urlResp.status); }
         } catch(e) { console.warn("Could not get URL for file", f.label, e.message); }
       }
+      if (files.length > 2) { userContent.push({ type: "text", text: "[Nota: S han omès " + (files.length - 2) + " documents per limit de context. Selecciona els mes rellevants des de PDFs]" }); }
       userContent.push({ type: "text", text: t });
-      const body = { model: "mistral-small-latest", messages: [{ role: "system", content: sysPrompt }, ...histMessages, { role: "user", content: userContent }], max_tokens: 16000, temperature: 0.2 };
+      const body = { model: "mistral-large-latest", messages: [{ role: "system", content: sysPrompt }, ...histMessages, { role: "user", content: userContent }], max_tokens: 16000, temperature: 0.2 };
       const resp = await fetch("https://api.mistral.ai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + config.mistralKey }, body: JSON.stringify(body) });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || JSON.stringify(data).slice(0,200));
@@ -2190,7 +2192,7 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
         msgs.map((m, i) => /*#__PURE__*/React.createElement("div", { key: i, style: { display: "flex", gap: 8, alignItems: "flex-start", flexDirection: m.role === "user" ? "row-reverse" : "row", maxWidth: "88%", alignSelf: m.role === "user" ? "flex-end" : "flex-start" } },
           /*#__PURE__*/React.createElement("div", { style: { width: 28, height: 28, borderRadius: "50%", background: m.role === "bot" ? theme.dark : theme.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 } }, m.role === "bot" ? "🤖" : "👤"),
           /*#__PURE__*/React.createElement("div", null,
-            /*#__PURE__*/React.createElement("div", { style: { background: m.role === "bot" ? BASE.parchm : theme.dark, border: m.role === "bot" ? "1px solid " + BASE.panelBd : "none", borderRadius: 10, padding: "9px 12px", fontSize: 13, lineHeight: 1.7, color: m.role === "bot" ? BASE.ink : "white", whiteSpace: "pre-wrap" } }, m.text),
+            /*#__PURE__*/React.createElement("div", { style: { background: m.role === "bot" ? "#1A1A22" : "#6C63FF", border: m.role === "bot" ? "1px solid #2E2E3E" : "none", borderRadius: 10, padding: "9px 12px", fontSize: 13, lineHeight: 1.7, color: "#F0F0F8", whiteSpace: "pre-wrap" } }, m.text),
             /*#__PURE__*/React.createElement("div", { style: { fontFamily: "monospace", fontSize: 9, color: BASE.inkMute, marginTop: 2, textAlign: m.role === "user" ? "right" : "left" } }, m.time)
           )
         )),
