@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- My Garage v1.5 - GEMINI-2.0-FLASH-LATEST - Build 2026-07-03 22:05 -->
+<!-- My Garage v3.3 - Build 2026-10-16 -->
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>My Garage v3.2 — Gestió de vehicles</title>
+<title>My Garage v3.3 — Gestió de vehicles</title>
 <meta name="description" content="App personal de manteniment de vehicles amb Google Drive">
 <meta name="theme-color" content="#1A1208">
 
@@ -13,7 +13,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- React + Babel (CDN — no build step needed) -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -21,9 +21,19 @@
 
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client"></script>
+<!-- PDF.js per extreure text de PDFs al navegador (sense servidor) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module" id="pdfjs-script"></script>
+<script>
+  // Carrega pdf.js com a mòdul i l'exposa globalment
+  (async () => {
+    const pdfjsModule = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
+    window.pdfjsLib = pdfjsModule;
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+  })();
+</script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap');
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -90,7 +100,7 @@
   }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   .login-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 36px; font-weight: 700;
     color: var(--text); margin-bottom: 4px;
     letter-spacing: -1px;
@@ -164,7 +174,7 @@
     box-shadow: var(--shadow-lg);
   }
   .config-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 22px; font-weight: 700;
     color: var(--text); margin-bottom: 20px;
   }
@@ -285,9 +295,9 @@ window.onerror = function(msg, src, line, col, err) {
     </div>
 
     <div class="cfg-field">
-      <div class="cfg-label">Mistral API Key (opcional — xatbot general)</div>
-      <input type="password" class="cfg-input" id="cfg-mistral-key" placeholder="...">
-      <div class="cfg-hint">Obtén-la a: console.mistral.ai → API Keys</div>
+      <div class="cfg-label">Groq API Key (xatbot Garage AI — gratuït)</div>
+      <input type="password" class="cfg-input" id="cfg-groq-key" placeholder="gsk_...">
+      <div class="cfg-hint">Obtén-la a: <strong>console.groq.com</strong> → API Keys (gratuït)</div>
     </div>
 
     <div class="cfg-actions">
@@ -318,14 +328,14 @@ let _driveFileId = null;
 window._garageData = {}; 
 window._currentUser = null;
 
-// Les claus opcionals (Mistral, Vision) sí es guarden al sessionStorage
+// Les claus opcionals (Groq, Vision) sí es guarden al sessionStorage
 // (només duren mentre el navegador és obert — no persisteixen)
 function getConfig() {
   try { return JSON.parse(sessionStorage.getItem('mgkeys') || '{}'); } catch { return {}; }
 }
 function saveConfigLocal(cfg) {
   // Guardar només les claus API opcionals (NO el clientId) al sessionStorage
-  const keys = { visionKey: cfg.visionKey || '', mistralKey: cfg.mistralKey || '', geminiKey: cfg.geminiKey || '' };
+  const keys = { visionKey: cfg.visionKey || '', groqKey: cfg.groqKey || '', geminiKey: cfg.geminiKey || '' };
   sessionStorage.setItem('mgkeys', JSON.stringify(keys));
 }
 
@@ -333,7 +343,7 @@ function saveConfigLocal(cfg) {
 function showConfig() {
   const cfg = getConfig();
   document.getElementById('cfg-vision-key').value = cfg.visionKey || '';
-  document.getElementById('cfg-mistral-key').value = cfg.mistralKey || '';
+  document.getElementById('cfg-groq-key').value = cfg.groqKey || '';
   document.getElementById('config-overlay').classList.add('visible');
 }
 function hideConfig() {
@@ -343,7 +353,7 @@ function saveConfig() {
   const gkEl = document.getElementById('cfg-gemini-key');
   const cfg = {
     visionKey: document.getElementById('cfg-vision-key').value.trim(),
-    mistralKey: document.getElementById('cfg-mistral-key').value.trim(),
+    groqKey: document.getElementById('cfg-groq-key').value.trim(),
     geminiKey: gkEl ? gkEl.value.trim() : '',
   };
   saveConfigLocal(cfg);
@@ -353,7 +363,7 @@ function saveConfig() {
 window.addEventListener('load', () => {
   const cfg = getConfig();
   if (cfg.visionKey) document.getElementById('cfg-vision-key').value = cfg.visionKey;
-  if (cfg.mistralKey) document.getElementById('cfg-mistral-key').value = cfg.mistralKey;
+  if (cfg.groqKey) document.getElementById('cfg-groq-key').value = cfg.groqKey;
   const gkEl = document.getElementById('cfg-gemini-key'); if (gkEl && cfg.geminiKey) gkEl.value = cfg.geminiKey;
   // Wire up button properly after all scripts loaded
   const btn = document.getElementById('google-login-btn');
@@ -614,7 +624,7 @@ function mountApp() {
   const cfg = getConfig();
   window._appConfig = {
     visionKey: cfg.visionKey || '',
-    mistralKey: cfg.mistralKey || '',
+    groqKey: cfg.groqKey || '',
     geminiKey: cfg.geminiKey || '',
   };
   if (typeof window._mountGarageApp === 'function') {
@@ -1960,7 +1970,7 @@ function PartsTab({ theme, vehicleType }) {
 
 }
 
-// ─── CHATBOT TAB (Mistral Files API — permanent) ────────────────────
+// ─── CHATBOT TAB (Groq + pdf.js client-side — gratuït) ──────────────
 function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme, allData, setAllData, vehicleId }) {
   const vdata = allData && vehicleId && allData[vehicleId] ? allData[vehicleId] : {};
   const [conversations, setConversations] = React.useState(vdata.conversations || []);
@@ -1975,8 +1985,8 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
   const [showUpload, setShowUpload] = React.useState(false);
   const [showDossier, setShowDossier] = React.useState(false);
   const [showSidebar, setShowSidebar] = React.useState(false);
-  const [showKeyInput, setShowKeyInput] = React.useState(!config.mistralKey);
-  const [keyDraft, setKeyDraft] = React.useState(config.mistralKey || "");
+  const [showKeyInput, setShowKeyInput] = React.useState(!config.groqKey);
+  const [keyDraft, setKeyDraft] = React.useState(config.groqKey || "");
   const [uploadLabel, setUploadLabel] = React.useState("Manual de taller oficial SEAT");
   const [importingComponents, setImportingComponents] = React.useState(false);
   const msgsEnd = React.useRef();
@@ -2020,22 +2030,41 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
   }, []);
 
   async function handleUpload(file) {
-    const key = config.mistralKey;
-    if (!key) { setUploadError("Cal la clau API de Mistral"); return; }
-    setUploading(true); setUploadError(""); setUploadProgress("Pujant " + (file.size/1024/1024).toFixed(1) + " MB a Mistral...");
+    const key = config.groqKey;
+    if (!key) { setUploadError("Cal la clau API de Groq (console.groq.com)"); return; }
+    if (!window.pdfjsLib) { setUploadError("Carregant pdf.js... torna-ho a intentar en uns segons."); return; }
+    setUploading(true); setUploadError(""); setUploadProgress("Llegint PDF (" + (file.size/1024/1024).toFixed(1) + " MB)...");
     try {
-      const formData = new FormData();
-      formData.append("file", file, file.name);
-      formData.append("purpose", "ocr");
-      const resp = await fetch("https://api.mistral.ai/v1/files", { method: "POST", headers: { "Authorization": "Bearer " + key }, body: formData });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.message || JSON.stringify(data).slice(0,150));
-      if (!data.id) throw new Error("No s ha rebut ID del fitxer");
-      const newFile = { label: uploadLabel, fileId: data.id, filename: data.filename || file.name, sizeMB: (file.size/1024/1024).toFixed(1), uploadedAt: new Date().toISOString() };
+      // 1. Extract text with pdf.js
+      const arrayBuffer = await file.arrayBuffer();
+      setUploadProgress("Extraient text del PDF...");
+      const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = "";
+      for (let p = 1; p <= pdf.numPages; p++) {
+        if (p % 10 === 0) setUploadProgress("Pàgina " + p + "/" + pdf.numPages + "...");
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        fullText += content.items.map(i => i.str).join(" ") + "\n";
+      }
+      if (fullText.trim().length < 100) throw new Error("El PDF no té text seleccionable (és escanejat). Necessita OCR previ.");
+      // 2. Split into ~500-word chunks
+      setUploadProgress("Indexant " + pdf.numPages + " pàgines...");
+      const words = fullText.split(/\s+/).filter(Boolean);
+      const CHUNK_SIZE = 500;
+      const chunks = [];
+      for (let i = 0; i < words.length; i += CHUNK_SIZE) {
+        chunks.push({ idx: chunks.length, text: words.slice(i, i + CHUNK_SIZE).join(" ") });
+      }
+      // 3. Save chunks JSON to Drive (as part of allData)
+      const chunksKey = "chunks_" + uploadLabel.replace(/\s+/g, "_").slice(0, 40);
+      const newFile = { label: uploadLabel, chunksKey, filename: file.name, sizeMB: (file.size/1024/1024).toFixed(1), numPages: pdf.numPages, numChunks: chunks.length, uploadedAt: new Date().toISOString() };
       const newFiles = [...files.filter(f => f.label !== uploadLabel), newFile];
       setFiles(newFiles);
-      saveState(undefined, newFiles, undefined);
-      const confirmMsg = { role: "bot", text: "✅ " + uploadLabel + " pujat (" + newFile.sizeMB + " MB). Permanent a Mistral.", time: (() => { const n = new Date(); return n.toLocaleDateString("ca-ES", {day:"2-digit",month:"2-digit"}) + " " + n.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }); })() };
+      // Store chunks in allData under vehicleId
+      if (setAllData && vehicleId) {
+        setAllData(prev => ({ ...prev, [vehicleId]: { ...(prev[vehicleId] || {}), chatFiles: newFiles, [chunksKey]: chunks } }));
+      }
+      const confirmMsg = { role: "bot", text: "✅ " + uploadLabel + " processat localment: " + pdf.numPages + " pàgines → " + chunks.length + " fragments indexats. Cap dada surt del teu dispositiu.", time: (() => { const n = new Date(); return n.toLocaleDateString("ca-ES", {day:"2-digit",month:"2-digit"}) + " " + n.toLocaleTimeString("ca-ES", { hour: "2-digit", minute: "2-digit" }); })() };
       updateActiveConv([...msgs, confirmMsg]);
       setShowUpload(false);
     } catch(e) { setUploadError("Error: " + e.message); }
@@ -2053,29 +2082,38 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
     updateActiveConv(newMsgs, undefined, newTitle);
     setLoading(true);
     setTimeout(() => msgsEnd.current?.scrollIntoView({ behavior: "smooth" }), 50);
-    if (!config.mistralKey) { updateActiveConv([...newMsgs, { role: "bot", text: "Cal configurar la clau API de Mistral.", time }]); setLoading(false); return; }
+    if (!config.groqKey) { updateActiveConv([...newMsgs, { role: "bot", text: "Cal configurar la clau API de Groq (gratuïta a console.groq.com).", time }]); setLoading(false); return; }
     try {
       const ivSummary = ivs.slice(0, 5).map(iv => iv.date + ": " + iv.notes.slice(0, 80) + " (" + iv.km + " km)").join(", ");
-      const sysPrompt = ["Ets un expert mecanico especialista en " + (vehicle.name || theme.name) + ".", "Respon sempre en catala. Sigues precis i cita el numero de pagina quan puguis.", "Vehicle: " + (vehicle.name || "") + " | Any: " + (vehicle.year || "") + " | Motor: " + (vehicle.engine || "") + " | Km: " + km.toLocaleString(), dossier ? "Notes del propietari: " + dossier : "", ivSummary ? "Ultimes intervencions: " + ivSummary : "", files.length > 0 ? "Tens acces als documents tecnics. Consulta sempre els PDFs adjunts." : ""].filter(Boolean).join("\n");
-      const histMessages = history.slice(-6).map(h => ({ role: h.role === "bot" ? "assistant" : "user", content: h.content }));
-      const userContent = [];
-      // Send max 2 files per request to avoid context length limits
-      const filesToSend = files.slice(0, 2);
-      for (const f of filesToSend) {
-        const mistralFileId = f.fileId || f.mistralFileId;
-        if (!mistralFileId) { console.warn("File missing fileId:", f.label); continue; }
-        try {
-          const urlResp = await fetch("https://api.mistral.ai/v1/files/" + mistralFileId + "/url", { method: "GET", headers: { "Authorization": "Bearer " + config.mistralKey } });
-          if (urlResp.ok) { const urlData = await urlResp.json(); if (urlData.url) userContent.push({ type: "document_url", document_url: urlData.url }); }
-          else { console.warn("Could not get signed URL for", f.label, "status:", urlResp.status); }
-        } catch(e) { console.warn("Could not get URL for file", f.label, e.message); }
+      // TF-IDF keyword search: find relevant chunks from all indexed manuals
+      let contextFromPDFs = "";
+      if (files.length > 0 && allData && vehicleId) {
+        const vd = allData[vehicleId] || {};
+        const queryWords = t.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+        let bestChunks = [];
+        for (const f of files) {
+          if (!f.chunksKey) continue;
+          const chunks = vd[f.chunksKey] || [];
+          const scored = chunks.map(ch => {
+            const txt = ch.text.toLowerCase();
+            const score = queryWords.reduce((s, w) => s + (txt.split(w).length - 1), 0);
+            return { score, text: ch.text, label: f.label };
+          }).filter(c => c.score > 0).sort((a, b) => b.score - a.score);
+          bestChunks = bestChunks.concat(scored.slice(0, 3));
+        }
+        bestChunks.sort((a, b) => b.score - a.score);
+        const top5 = bestChunks.slice(0, 5);
+        if (top5.length > 0) {
+          contextFromPDFs = "\n\n--- FRAGMENTS RELLEVANTS DELS MANUALS ---\n" + top5.map((c, i) => "[" + (i+1) + "] (" + c.label + "): " + c.text).join("\n\n") + "\n--- FI DELS FRAGMENTS ---";
+        }
       }
-      if (files.length > 2) { userContent.push({ type: "text", text: "[Nota: S han omès " + (files.length - 2) + " documents per limit de context. Selecciona els mes rellevants des de PDFs]" }); }
-      userContent.push({ type: "text", text: t });
-      const body = { model: "mistral-large-latest", messages: [{ role: "system", content: sysPrompt }, ...histMessages, { role: "user", content: userContent }], max_tokens: 16000, temperature: 0.2 };
-      const resp = await fetch("https://api.mistral.ai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + config.mistralKey }, body: JSON.stringify(body) });
+      const sysPrompt = ["Ets un expert mecànic especialista en " + (vehicle.name || theme.name) + ".", "Respon sempre en català. Sigues precís i cita el document font quan puguis.", "Vehicle: " + (vehicle.name || "") + " | Any: " + (vehicle.year || "") + " | Motor: " + (vehicle.engine || "") + " | Km: " + km.toLocaleString(), dossier ? "Notes del propietari: " + dossier : "", ivSummary ? "Últimes intervencions: " + ivSummary : "", files.length > 0 ? "Tens accés als fragments dels documents tècnics indexats." : ""].filter(Boolean).join("\n");
+      const histMessages = history.slice(-6).map(h => ({ role: h.role === "bot" ? "assistant" : "user", content: h.content }));
+      const userMessage = t + contextFromPDFs;
+      const body = { model: "llama-3.3-70b-versatile", messages: [{ role: "system", content: sysPrompt }, ...histMessages, { role: "user", content: userMessage }], max_tokens: 8192, temperature: 0.2 };
+      const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + config.groqKey }, body: JSON.stringify(body) });
       const data = await resp.json();
-      if (!resp.ok) throw new Error(data.message || JSON.stringify(data).slice(0,200));
+      if (!resp.ok) throw new Error((data.error && data.error.message) || JSON.stringify(data).slice(0,200));
       const reply = data.choices?.[0]?.message?.content || "No he pogut obtenir resposta.";
       const newHistory = [...history, { role: "user", content: t }, { role: "bot", content: reply }];
       const finalMsgs = [...newMsgs, { role: "bot", text: reply, time }];
@@ -2095,7 +2133,7 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
   }
 
   async function importComponents() {
-    if (!config.mistralKey || files.length === 0) return;
+    if (!config.groqKey || files.length === 0) return;
     setImportingComponents(true);
     await send("Basant-te en els manuals adjunts, genera un arbre de components JSON. Respon NOMES amb: IMPORT_COMPONENTS:[JSON_ARRAY]:END_IMPORT. Estructura: [{id:'g1',name:'Nom',icon:'⚙️',color:'#FF6B00',subgroups:[{id:'sg1',name:'Subgrup',parts:[{id:'p1',name:'Nom peca',pn:'ref',ikm:10000,im:12,specs:'Especificacions',tips:[{iv:'Interval',t:'Tasca'}],notes:''}]}]}]");
     setImportingComponents(false);
@@ -2106,11 +2144,11 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
   return /*#__PURE__*/React.createElement("div", null,
     /*#__PURE__*/React.createElement(SectionHead, { eyebrow: "Assistent tecnoc especialitzat", title: "GARAGE AI", theme: theme }),
     showKeyInput ? /*#__PURE__*/React.createElement(Card, { style: { padding: 16, marginBottom: 14 } },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: BASE.inkMid, marginBottom: 10 } }, "Cal una ", /*#__PURE__*/React.createElement("strong", null, "clau API de Mistral"), ". Obtén-la a console.mistral.ai → API Keys."),
-      /*#__PURE__*/React.createElement(Field, { label: "Mistral API Key" }, /*#__PURE__*/React.createElement("input", { style: inputStyle, type: "password", value: keyDraft, onChange: e => setKeyDraft(e.target.value), placeholder: "..." })),
-      /*#__PURE__*/React.createElement(Btn, { onClick: () => { setConfig(c => ({ ...c, mistralKey: keyDraft })); setShowKeyInput(false); }, variant: "primary", style: { width: "100%", justifyContent: "center", marginTop: 10 }, theme: theme }, "Activar Garage AI")
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, color: BASE.inkMid, marginBottom: 10 } }, "Cal una ", /*#__PURE__*/React.createElement("strong", null, "clau API de Groq"), " (gratuïta). Obtén-la a ", /*#__PURE__*/React.createElement("a", { href: "https://console.groq.com", target: "_blank", rel: "noreferrer" }, "console.groq.com"), " → API Keys."),
+      /*#__PURE__*/React.createElement(Field, { label: "Groq API Key (gratuïta)" }, /*#__PURE__*/React.createElement("input", { style: inputStyle, type: "password", value: keyDraft, onChange: e => setKeyDraft(e.target.value), placeholder: "gsk_..." })),
+      /*#__PURE__*/React.createElement(Btn, { onClick: () => { setConfig(c => ({ ...c, groqKey: keyDraft })); setShowKeyInput(false); }, variant: "primary", style: { width: "100%", justifyContent: "center", marginTop: 10 }, theme: theme }, "Activar Garage AI")
     ) : /*#__PURE__*/React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 } },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#276749", fontFamily: "monospace" } }, "✅ Mistral · ", files.length, " PDFs · ", conversations.length, " converses"),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 11, color: "#276749", fontFamily: "monospace" } }, "✅ Groq · ", files.length, " manuals · ", conversations.length, " converses"),
       /*#__PURE__*/React.createElement("div", { style: { display: "flex", gap: 6 } },
         /*#__PURE__*/React.createElement(Btn, { onClick: () => setShowKeyInput(true), variant: "ghost", size: "sm", theme: theme }, "Clau"),
         /*#__PURE__*/React.createElement(Btn, { onClick: () => setShowSidebar(!showSidebar), variant: "secondary", size: "sm", theme: theme }, "💬 Converses"),
@@ -2178,7 +2216,7 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
         /*#__PURE__*/React.createElement(Btn, { onClick: () => document.getElementById("pdf-upload-input").click(), variant: "primary", style: { width: "100%", justifyContent: "center" }, theme: theme, disabled: uploading }, uploading ? "⏳ " + (uploadProgress || "Pujant...") : "📤 Seleccionar i pujar PDF")
       ),
       uploadError && /*#__PURE__*/React.createElement("div", { style: { marginTop: 8, color: "#C53030", fontSize: 12 } }, uploadError),
-      /*#__PURE__*/React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: BASE.inkMute } }, "♾️ Els PDFs es guarden permanentment als servidors de Mistral.")
+      /*#__PURE__*/React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: BASE.inkMute } }, "🔒 El text s'extreu localment al teu navegador. Cap dada del PDF surt del teu dispositiu.")
     ),
     !showKeyInput && !showUpload && !showDossier && !showSidebar && /*#__PURE__*/React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 } },
       QUICK.map((q, i) => /*#__PURE__*/React.createElement("button", { key: i, onClick: () => send(q), style: { background: BASE.parchm, border: "1px solid " + BASE.panelBd, color: BASE.inkMid, fontSize: 11, padding: "6px 10px", borderRadius: 20, cursor: "pointer" } }, q))
@@ -2562,9 +2600,9 @@ function ConfigModal({ config, setConfig, onClose, theme }) {
     React.createElement("span", { style: { fontSize: 9, color: BASE.inkMute, marginTop: 3 } }, "Obtén-la a: console.cloud.google.com → Cloud Vision API")
     ), /*#__PURE__*/
     React.createElement("div", { style: { marginTop: 14 } }, /*#__PURE__*/
-    React.createElement(Field, { label: "💬 Mistral API Key (xatbot Garage AI)" }, /*#__PURE__*/
-    React.createElement("input", { style: inputStyle, type: "password", value: form.mistralKey || "", onChange: (e) => setForm((f) => ({ ...f, mistralKey: e.target.value })), placeholder: "..." }), /*#__PURE__*/
-    React.createElement("span", { style: { fontSize: 9, color: BASE.inkMute, marginTop: 3 } }, "Obtén-la a: console.mistral.ai → API Keys")
+    React.createElement(Field, { label: "💬 Groq API Key (xatbot Garage AI — gratuït)" }, /*#__PURE__*/
+    React.createElement("input", { style: inputStyle, type: "password", value: form.groqKey || "", onChange: (e) => setForm((f) => ({ ...f, groqKey: e.target.value })), placeholder: "gsk_..." }), /*#__PURE__*/
+    React.createElement("span", { style: { fontSize: 9, color: BASE.inkMute, marginTop: 3 } }, "Obtén-la a: console.groq.com → API Keys (gratuït)")
     )
     ), /*#__PURE__*/
     React.createElement(Divider, null), /*#__PURE__*/
@@ -2697,7 +2735,7 @@ function _GarageApp() {
   const [vehicles, setVehicles] = React.useState([]);
   const [allData, setAllData] = React.useState({});
   const [config, setConfig] = React.useState(() => ({
-    mistralKey: window._appConfig?.mistralKey || "",
+    groqKey: window._appConfig?.groqKey || "",
     visionKey: window._appConfig?.visionKey || "",
     googleClientId: ""
   }));
@@ -2710,11 +2748,12 @@ function _GarageApp() {
     const gd = window._garageData || {};
     const v = gd["vehicles"] !== undefined ? gd["vehicles"] : [];
     const d = gd["allData"] !== undefined ? gd["allData"] : {};
-    const c = gd["config"] !== undefined ? gd["config"] : { mistralKey: "", visionKey: "", geminiKey: "" };
+    const c = gd["config"] !== undefined ? gd["config"] : { groqKey: "", visionKey: "" };
     console.log("[Garage] _GarageApp loading data:", { vehicles: v.length, hasAllData: !!d, config: !!c });
     setVehicles(v);
     setAllData(d);
-    setConfig({ ...c, geminiKey: c.geminiKey || window._appConfig?.geminiKey || "" });
+    // Migració: si ve de versió anterior amb mistralKey, mou-la a groqKey
+    setConfig({ ...c, groqKey: c.groqKey || c.mistralKey || window._appConfig?.groqKey || "" });
     setLoaded(true);
   }, []);
 
