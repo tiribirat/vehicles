@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>My Garage v3.3 — Gestió de vehicles</title>
 <meta name="description" content="App personal de manteniment de vehicles amb Google Drive">
-<meta name="theme-color" content="#1A1208">
+<meta name="theme-color" content="#0C0D10">
 
 <!-- Fonts -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -271,7 +271,7 @@ window.onerror = function(msg, src, line, col, err) {
     <div id="login-error" class="login-error" style="display:none"></div>
 
     <div class="login-config">
-      Versió 3.2 · Dades privades i segures al teu Google Drive
+      Versió 3.3 · Dades privades i segures al teu Google Drive
     </div>
     <div id="debug-info" style="margin-top:10px; font-family:monospace; font-size:9px; color:rgba(156,138,106,.3); display:none;"></div>
   </div>
@@ -652,7 +652,7 @@ const THEMES = {
   vwt3: { accent: "#FF6B00", accent2: "#CC5500", dark: "#003D8F", dark2: "#001540", name: "VW T3", emoji: "🚐" },
   tesla3: { accent: "#E31937", accent2: "#B01020", dark: "#1A1A2E", dark2: "#0D0D1A", name: "Tesla Model 3", emoji: "⚡" },
   zx: { accent: "#C8A200", accent2: "#8B6F00", dark: "#1A3A1A", dark2: "#0D200D", name: "Citroën ZX", emoji: "🚗" },
-  seat600: { accent: "#8B1A1A", accent2: "#5C0A0A", dark: "#2A1A00", dark2: "#1A0D00", name: "SEAT 600", emoji: "🚙" }
+  seat600: { accent: "#E84040", accent2: "#C02020", dark: "#1A1A2E", dark2: "#0D0D1A", name: "SEAT 600", emoji: "🚙" }
 };
 
 // ─── STORAGE ─────────────────────────────────────────────────────────
@@ -875,7 +875,7 @@ const TREE_ZX = [
     { id: "zp-silen", name: "Silenciadors", pn: "", ikm: null, im: 48, specs: "Col-lector, tub central i silenciador final. L acer s oxida per condensacio interior.", tips: [{ iv: "Anual", t: "Inspeccio visual de forats, suports i unions" }], notes: "" }]
   }]
 },
-{ id: "z2", name: "Sistema de Frens", icon: "🛑", color: "#8B1A1A", subgroups: [
+{ id: "z2", name: "Sistema de Frens", icon: "🛑", color: "#E84040", subgroups: [
   { id: "zsg2a", name: "Frens davanter (disc)", parts: [
     { id: "zp-pdd", name: "Pastilles Dav. - Dreta", pn: "", ikm: 25000, im: null, specs: "Disc solid 247mm. Gruix minim 2mm.", tips: [{ iv: "Cada 20.000 km", t: "Mesura gruix pastilles" }], notes: "" },
     { id: "zp-pde", name: "Pastilles Dav. - Esquerra", pn: "", ikm: 25000, im: null, specs: "Canviar sempre per parelles.", tips: [{ iv: "Cada 20.000 km", t: "Mesura gruix" }], notes: "" },
@@ -934,7 +934,7 @@ const TREE_ZX = [
 
 
 const TREE_SEAT600 = [
-  { id:"s1", name:"Motor DA (767cc)", icon:"⚙️", color:"#8B1A1A", subgroups:[
+  { id:"s1", name:"Motor DA (767cc)", icon:"⚙️", color:"#E84040", subgroups:[
     { id:"ssg1a", name:"Lubricació", parts:[
       { id:"sp-oli", name:"Oli motor (sense filtre)", pn:"", ikm:5000, im:6, specs:"Oli mineral SAE 30. Capacitat ~2,5L. ATENCIO: No te filtre d oli canviable — netejar sedimentador en cada canvi. Motor nou: canvi als 1.500 i 3.000 km.", tips:[{iv:"Cada 500 km",t:"Comprovar nivell"},{iv:"Cada 5.000 km o 6 mesos",t:"Canvi complet d oli + neteja sedimentador"}], notes:"" },
       { id:"sp-bombaoli", name:"Bomba d oli (engranatges)", pn:"BD-030000.01", ikm:30000, im:null, specs:"Bomba d engranatges. Pressio normal: 2,5-3 kg/cm².", tips:[{iv:"Cada 30.000 km",t:"Revisio i neteja"}], notes:"" },
@@ -968,7 +968,7 @@ const TREE_SEAT600 = [
       { id:"sp-arrencada", name:"Motor d arrencada (MTA 12-1)", pn:"BD-908000.00", ikm:30000, im:null, specs:"12V.", tips:[{iv:"Cada 20.000 km",t:"Verificar estat"},{iv:"Cada 30.000 km",t:"Lubricar acoblament roda lliure"}], notes:"" },
     ]},
   ]},
-  { id:"s2", name:"Embragatge i Transmissio", icon:"🔄", color:"#5C0A0A", subgroups:[
+  { id:"s2", name:"Embragatge i Transmissio", icon:"🔄", color:"#C02020", subgroups:[
     { id:"ssg2a", name:"Embragatge", parts:[
       { id:"sp-disc", name:"Disc d embragatge (monodisc sec)", pn:"BD-125004.01", ikm:30000, im:null, specs:"Monodisc en sec.", tips:[{iv:"Cada 5.000 km",t:"Verificar recorregut pedal (minim 20mm en buit)"},{iv:"Cada 30.000 km",t:"Canvi del disc, plat i rodament axial"}], notes:"" },
       { id:"sp-plat", name:"Plat de pressio", pn:"BD-125042.00", ikm:30000, im:null, specs:"Substituir conjuntament amb el disc.", tips:[{iv:"Cada 30.000 km",t:"Canvi conjunt amb disc i rodament"}], notes:"" },
@@ -980,7 +980,7 @@ const TREE_SEAT600 = [
       { id:"sp-diferencial", name:"Diferencial", pn:"BD-145400.00", ikm:30000, im:null, specs:"Planetaris i satelits. Pare conic 8/39.", tips:[{iv:"Cada 30.000 km",t:"Reglar joc del diferencial"}], notes:"" },
     ]},
   ]},
-  { id:"s3", name:"Suspensio i Rodes", icon:"🔧", color:"#8B1A1A", subgroups:[
+  { id:"s3", name:"Suspensio i Rodes", icon:"🔧", color:"#E84040", subgroups:[
     { id:"ssg3a", name:"Suspensio davantera", parts:[
       { id:"sp-ballesta", name:"Ballesta transversal", pn:"BD-156099.00", ikm:30000, im:null, specs:"Ballesta transversal davantera.", tips:[{iv:"Cada 30.000 km",t:"Verificar estat i fixacions"}], notes:"" },
       { id:"sp-amortD", name:"Amortidors davanter (dreta i esquerra)", pn:"BD-156202.03", ikm:20000, im:null, specs:"Hidraulics. Canvi d oli cada 20.000 km.", tips:[{iv:"Cada 10.000 km",t:"Verificar nivell d oli"},{iv:"Cada 20.000 km",t:"Canvi d oli dels amortidors"}], notes:"" },
@@ -996,7 +996,7 @@ const TREE_SEAT600 = [
       { id:"sp-pneum", name:"Pneumatics (5.20-12)", pn:"", ikm:30000, im:null, specs:"Mida: 5,20-12. Pressio: Davanteres 1,00 kg/cm² / Posteriors 1,60 kg/cm². Canvi quan dibuix < 1,6mm.", tips:[{iv:"Cada 500 km",t:"Verificar pressio"},{iv:"Cada 5.000 km",t:"Permutar pneumatics"},{iv:"Cada 10.000 km",t:"Verificar equilibratge de rodes"}], notes:"" },
     ]},
   ]},
-  { id:"s4", name:"Direccio", icon:"🎯", color:"#5C0A0A", subgroups:[
+  { id:"s4", name:"Direccio", icon:"🎯", color:"#C02020", subgroups:[
     { id:"ssg4a", name:"Caixa de direccio", parts:[
       { id:"sp-oliDir", name:"Oli caixa de direccio", pn:"", ikm:20000, im:24, specs:"Tipus vis sense fi i sector dentat. Relacio desmultiplicacio: 2/26. Angle gir: interior 35° / exterior 32°30'. Radi de gir: 4,35m.", tips:[{iv:"Cada 5.000 km",t:"Verificar nivell d oli"},{iv:"Cada 10.000 km",t:"Reglar joc de la direccio"},{iv:"Cada 20.000 km",t:"Canvi d oli"}], notes:"" },
       { id:"sp-sectorDir", name:"Sector dentat", pn:"BD-162213.50", ikm:30000, im:null, specs:"Sector dentat de la caixa de direccio.", tips:[{iv:"Cada 30.000 km",t:"Verificar desgast"}], notes:"" },
@@ -1014,14 +1014,14 @@ const TREE_SEAT600 = [
       { id:"sp-frenoma", name:"Fre de ma (mecanico, rodes posteriors)", pn:"", ikm:10000, im:null, specs:"Accio mecanica sobre rodes posteriors.", tips:[{iv:"Cada 10.000 km",t:"Reglar fre de ma"}], notes:"" },
     ]},
   ]},
-  { id:"s6", name:"Sistema Electric", icon:"⚡", color:"#8B1A1A", subgroups:[
+  { id:"s6", name:"Sistema Electric", icon:"⚡", color:"#E84040", subgroups:[
     { id:"ssg6a", name:"Generacio i emmagatzematge", parts:[
       { id:"sp-bateria", name:"Bateria (12V, 36 A/h)", pn:"BD-920000.02", ikm:null, im:18, specs:"12V, 36 A/h.", tips:[{iv:"Cada 1.500 km",t:"Verificar nivell electròlit"},{iv:"Cada 2 anys",t:"Canvi de l electròlit"}], notes:"" },
       { id:"sp-dinamo", name:"Dinamo (DNE12-6)", pn:"BD-902020.00", ikm:20000, im:null, specs:"12V.", tips:[{iv:"Cada 20.000 km",t:"Verificar estat i escombretes"}], notes:"" },
       { id:"sp-regulador", name:"Regulador (GRC 12-12)", pn:"BD-906000.01", ikm:30000, im:null, specs:"Regulador de tensio.", tips:[{iv:"Cada 30.000 km",t:"Verificar funcionament i tensio de sortida"}], notes:"" },
     ]},
   ]},
-  { id:"s7", name:"Carrosseria", icon:"🚙", color:"#8B1A1A", subgroups:[
+  { id:"s7", name:"Carrosseria", icon:"🚙", color:"#E84040", subgroups:[
     { id:"ssg7a", name:"Estructura i tancaments", parts:[
       { id:"sp-pintura", name:"Pintura i xapa", pn:"", ikm:null, im:6, specs:"Zones vulnerables: baixos, llindes de portes, passos de roda.", tips:[{iv:"Cada 6 mesos",t:"Inspeccio visual i tractament anticorrosiu si cal"},{iv:"Cada 10.000 km",t:"Verificar estat general de la pintura"}], notes:"" },
       { id:"sp-juntes", name:"Juntes d estanqueitat", pn:"", ikm:null, im:24, specs:"Juntes de portes, parabrisa i luneta.", tips:[{iv:"Cada 2 anys",t:"Verificar estanqueitat amb prova d aigua"},{iv:"Cada 20.000 km",t:"Verificar estat de totes les juntes"}], notes:"" },
@@ -1168,7 +1168,7 @@ function Btn({ onClick, variant = "primary", size = "md", children, style, theme
 function Field({ label, children }) {
   return /*#__PURE__*/React.createElement("label", { style: { display: "flex", flexDirection: "column", gap: 4, fontSize: 9, letterSpacing: 2, color: BASE.inkMute, textTransform: "uppercase", fontFamily: "monospace" } }, label, children);
 }
-const inputStyle = { background: "white", border: `1px solid ${BASE.panelBd}`, borderRadius: 6, fontSize: 14, padding: "8px 12px", color: BASE.ink, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
+const inputStyle = { background: "#22232F", border: `1px solid #2E2E3E`, borderRadius: 6, fontSize: 14, padding: "8px 12px", color: "#F0F0F8", outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
 const textareaStyle = { ...inputStyle, resize: "vertical", minHeight: 70 };
 
 function Divider() {return /*#__PURE__*/React.createElement("div", { style: { height: 1, background: BASE.panelBd, margin: "14px 0", opacity: .5 } });}
@@ -1208,30 +1208,30 @@ function handleLogout() {
 
 function GarageScreen({ vehicles, onSelect, onAdd, onDelete }) {
   return (/*#__PURE__*/
-    React.createElement("div", { style: { minHeight: "100vh", background: "#0F0F13", fontFamily: "'Segoe UI', system-ui, sans-serif" } }, /*#__PURE__*/
+    React.createElement("div", { style: { minHeight: "100vh", background: "#0F0F13", fontFamily: "'Inter', system-ui, sans-serif" } }, /*#__PURE__*/
     React.createElement("style", null, `* { box-sizing: border-box; margin: 0; padding: 0; } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: ${BASE.panelBd}; border-radius: 2px; }`), /*#__PURE__*/
 
 
-    React.createElement("div", { style: { background: "#1A1208", borderBottom: "3px solid #C8A96E", padding: "16px 20px 20px" } }, /*#__PURE__*/
+    React.createElement("div", { style: { background: "#0C0D10", borderBottom: "1px solid #1E2030", padding: "16px 20px 20px" } }, /*#__PURE__*/
     React.createElement("div", { style: { maxWidth: 700, margin: "0 auto" } }, /*#__PURE__*/
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 } }, /*#__PURE__*/
     React.createElement("div", null, /*#__PURE__*/
-    React.createElement("div", { style: { fontSize: 11, letterSpacing: 5, color: "#9C8A6A", fontFamily: "monospace", marginBottom: 4 } }, "EL MEU GARATGE"), /*#__PURE__*/
-    React.createElement("div", { style: { fontSize: "clamp(26px, 5vw, 42px)", fontWeight: 900, letterSpacing: 4, color: "#F5EDD8", lineHeight: 1 } }, "MY GARAGE"), /*#__PURE__*/
-    React.createElement("div", { style: { fontSize: 12, color: "#6e6248", marginTop: 4 } }, vehicles.length, " vehicle", vehicles.length !== 1 ? "s" : "", " registrat", vehicles.length !== 1 ? "s" : "")
+    React.createElement("div", { style: { fontSize: 10, letterSpacing: 5, color: "#5A6080", fontFamily: "monospace", marginBottom: 4, textTransform: "uppercase" } }, "El meu garatge"), /*#__PURE__*/
+    React.createElement("div", { style: { fontFamily: "'Outfit', sans-serif", fontSize: "clamp(26px, 5vw, 38px)", fontWeight: 800, letterSpacing: 2, color: "#F0F0F8", lineHeight: 1 } }, "MY GARAGE"), /*#__PURE__*/
+    React.createElement("div", { style: { fontSize: 12, color: "#5A6080", marginTop: 5, fontFamily: "monospace" } }, vehicles.length, " vehicle", vehicles.length !== 1 ? "s" : "", " registrat", vehicles.length !== 1 ? "s" : "")
     ),
     window._currentUser && /*#__PURE__*/
     React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 } }, /*#__PURE__*/
     React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
-    window._currentUser.picture && /*#__PURE__*/React.createElement("img", { src: window._currentUser.picture, style: { width: 32, height: 32, borderRadius: "50%", border: "2px solid rgba(200,169,110,.3)" }, alt: "" }), /*#__PURE__*/
+    window._currentUser.picture && /*#__PURE__*/React.createElement("img", { src: window._currentUser.picture, style: { width: 32, height: 32, borderRadius: "50%", border: "2px solid rgba(108,99,255,.35)" }, alt: "" }), /*#__PURE__*/
     React.createElement("div", null, /*#__PURE__*/
-    React.createElement("div", { style: { fontSize: 12, color: "#F5EDD8", fontWeight: 700 } }, window._currentUser.name), /*#__PURE__*/
-    React.createElement("div", { style: { fontSize: 10, color: "#6e6248" } }, window._currentUser.email)
+    React.createElement("div", { style: { fontSize: 12, color: "#F0F0F8", fontWeight: 700 } }, window._currentUser.name), /*#__PURE__*/
+    React.createElement("div", { style: { fontSize: 10, color: "#5A6080" } }, window._currentUser.email)
     )
     ), /*#__PURE__*/
     React.createElement("div", { style: { display: "flex", gap: 6 } }, /*#__PURE__*/
-    React.createElement("button", { onClick: () => window.saveToDrive && window.saveToDrive(), style: { background: "rgba(200,169,110,.1)", border: "1px solid rgba(200,169,110,.2)", color: "#C8A96E", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontSize: 11, fontFamily: "monospace" } }, "☁️ Sync Drive"), /*#__PURE__*/
-    React.createElement("button", { onClick: () => handleLogout(), style: { background: "rgba(197,48,48,.1)", border: "1px solid rgba(197,48,48,.2)", color: "#ff8080", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontSize: 11, fontFamily: "monospace" } }, "↩ Sortir")
+    React.createElement("button", { onClick: () => window.saveToDrive && window.saveToDrive(), style: { background: "rgba(108,99,255,.1)", border: "1px solid rgba(108,99,255,.2)", color: "#8B84FF", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontSize: 11, fontFamily: "monospace" } }, "☁️ Drive"), /*#__PURE__*/
+    React.createElement("button", { onClick: () => handleLogout(), style: { background: "rgba(197,48,48,.1)", border: "1px solid rgba(197,48,48,.2)", color: "#F87171", borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontSize: 11, fontFamily: "monospace" } }, "↩ Sortir")
     )
     )
 
@@ -1299,7 +1299,7 @@ function AddVehicleModal({ onAdd, onClose }) {
   { id: "vwt3", label: "VW T3 Transporter", sub: "Vehicle clàssic / furgoneta camper (1979-1992)", emoji: "🚐", color: "#FF6B00" },
   { id: "tesla3", label: "Tesla Model 3", sub: "Vehicle elèctric pur — manteniment específic", emoji: "⚡", color: "#E31937" },
   { id: "zx", label: "Citroën ZX", sub: "Turisme gasolina/dièsel anys 90", emoji: "🚗", color: "#C8A200" },
-  { id: "seat600", label: "SEAT 600", sub: "Vehicle d'època / clàssic de col·lecció", emoji: "🚙", color: "#8B1A1A" },
+  { id: "seat600", label: "SEAT 600", sub: "Vehicle d'època / clàssic de col·lecció", emoji: "🚙", color: "#E84040" },
   { id: "custom", label: "Altre vehicle", sub: "Vehicle personalitzat — configuració manual", emoji: "🚘", color: "#6b7280" }];
 
 
@@ -1312,7 +1312,7 @@ function AddVehicleModal({ onAdd, onClose }) {
 
   return (/*#__PURE__*/
     React.createElement("div", { onClick: (e) => e.target === e.currentTarget && onClose(), style: { position: "fixed", inset: 0, background: "rgba(0,0,0,.65)", zIndex: 500, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(3px)" } }, /*#__PURE__*/
-    React.createElement("div", { style: { background: BASE.panel, borderRadius: "16px 16px 0 0", borderTop: "4px solid #C8A96E", padding: "20px 20px 32px", width: "100%", maxWidth: 600, maxHeight: "92vh", overflowY: "auto" } }, /*#__PURE__*/
+    React.createElement("div", { style: { background: BASE.panel, borderRadius: "16px 16px 0 0", borderTop: "4px solid #6C63FF", padding: "20px 20px 32px", width: "100%", maxWidth: 600, maxHeight: "92vh", overflowY: "auto" } }, /*#__PURE__*/
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 } }, /*#__PURE__*/
     React.createElement("div", { style: { fontWeight: 900, fontSize: 18, letterSpacing: 2, color: BASE.ink } },
     step === 1 ? "➕ Afegir vehicle" : "📝 Dades del vehicle"
@@ -1326,7 +1326,7 @@ function AddVehicleModal({ onAdd, onClose }) {
     React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } },
     VEHICLE_TYPES.map((vt) => /*#__PURE__*/
     React.createElement("button", { key: vt.id, onClick: () => {setType(vt.id);setForm({ name: vt.label });setStep(2);},
-      style: { display: "flex", alignItems: "center", gap: 14, background: type === vt.id ? vt.color + "15" : "white", border: `2px solid ${type === vt.id ? vt.color : BASE.panelBd}`, borderRadius: 10, padding: "14px 16px", cursor: "pointer", textAlign: "left", transition: "all .15s" } }, /*#__PURE__*/
+      style: { display: "flex", alignItems: "center", gap: 14, background: type === vt.id ? vt.color + "22" : "#22232F", border: `2px solid ${type === vt.id ? vt.color : "#2E2E3E"}`, borderRadius: 10, padding: "14px 16px", cursor: "pointer", textAlign: "left", transition: "all .15s" } }, /*#__PURE__*/
     React.createElement("span", { style: { fontSize: 32, flexShrink: 0 } }, vt.emoji), /*#__PURE__*/
     React.createElement("div", null, /*#__PURE__*/
     React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: BASE.ink } }, vt.label), /*#__PURE__*/
@@ -1783,7 +1783,7 @@ function ITVTab({ itvHistory, setItvHistory, docs, setDocs, config, theme, vehic
     ), /*#__PURE__*/
     React.createElement("input", { type: "file", ref: fileRef, accept: "image/*,.pdf,.txt", style: { display: "none" }, onChange: (e) => {if (e.target.files[0]) runOcr(e.target.files[0]);} }),
     form.fileName && /*#__PURE__*/React.createElement("div", { style: { fontFamily: "monospace", fontSize: 10, color: theme.dark, marginTop: 6 } }, "📎 ", form.fileName),
-    form.ocrText && /*#__PURE__*/React.createElement("details", { style: { marginTop: 6 } }, /*#__PURE__*/React.createElement("summary", { style: { fontFamily: "monospace", fontSize: 9, color: theme.accent, cursor: "pointer", letterSpacing: 2 } }, "TEXT OCR DETECTAT"), /*#__PURE__*/React.createElement("pre", { style: { fontSize: 10, color: BASE.inkMid, background: "#eef2ff", padding: 10, borderRadius: 6, maxHeight: 100, overflowY: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all", marginTop: 6 } }, form.ocrText.slice(0, 400))), /*#__PURE__*/
+    form.ocrText && /*#__PURE__*/React.createElement("details", { style: { marginTop: 6 } }, /*#__PURE__*/React.createElement("summary", { style: { fontFamily: "monospace", fontSize: 9, color: theme.accent, cursor: "pointer", letterSpacing: 2 } }, "TEXT OCR DETECTAT"), /*#__PURE__*/React.createElement("pre", { style: { fontSize: 10, color: BASE.inkMid, background: "#1A1A2E", padding: 10, borderRadius: 6, maxHeight: 100, overflowY: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all", marginTop: 6 } }, form.ocrText.slice(0, 400))), /*#__PURE__*/
     React.createElement("div", { style: { display: "flex", gap: 10, marginTop: 12 } }, /*#__PURE__*/
     React.createElement(Btn, { onClick: () => setShowForm(false), variant: "ghost", style: { flex: 1 }, theme: theme }, "Cancel·lar"), /*#__PURE__*/
     React.createElement(Btn, { onClick: addItv, variant: "primary", style: { flex: 1 }, theme: theme }, "💾 Guardar ITV")
@@ -1802,7 +1802,7 @@ function ITVTab({ itvHistory, setItvHistory, docs, setDocs, config, theme, vehic
     itv.station && /*#__PURE__*/React.createElement("span", { style: { fontFamily: "monospace", fontSize: 10, color: BASE.inkMute } }, "📍 ", itv.station)
     ),
     itv.notes && /*#__PURE__*/React.createElement("p", { style: { fontSize: 12, color: BASE.inkMid, lineHeight: 1.5 } }, itv.notes),
-    itv.ocrText && /*#__PURE__*/React.createElement("details", null, /*#__PURE__*/React.createElement("summary", { style: { fontSize: 9, color: theme.accent, cursor: "pointer", fontFamily: "monospace" } }, "TEXT OCR"), /*#__PURE__*/React.createElement("pre", { style: { fontSize: 9, background: "#eef2ff", padding: 8, borderRadius: 4, maxHeight: 80, overflowY: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all", marginTop: 4 } }, itv.ocrText.slice(0, 300)))
+    itv.ocrText && /*#__PURE__*/React.createElement("details", null, /*#__PURE__*/React.createElement("summary", { style: { fontSize: 9, color: theme.accent, cursor: "pointer", fontFamily: "monospace" } }, "TEXT OCR"), /*#__PURE__*/React.createElement("pre", { style: { fontSize: 9, background: "#1A1A2E", padding: 8, borderRadius: 4, maxHeight: 80, overflowY: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all", marginTop: 4 } }, itv.ocrText.slice(0, 300)))
     ), /*#__PURE__*/
     React.createElement(Btn, { onClick: () => {if (window.confirm("Eliminar?")) setItvHistory((p) => p.filter((i) => i.id !== itv.id));}, variant: "danger", size: "sm", theme: theme, style: { marginLeft: 10, flexShrink: 0 } }, "✕")
     )
@@ -2336,7 +2336,7 @@ function AlertReviewModal({ alert, onClose, onRegister, km, theme, vehicleType }
     alert.partId && step !== "done" && /*#__PURE__*/
     React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 18 } },
     [["detail", "📋 Detalls"], ["register", "✅ Registrar revisió"]].map(([s, l]) => /*#__PURE__*/
-    React.createElement("button", { key: s, onClick: () => setStep(s), style: { flex: 1, padding: "8px", borderRadius: 8, border: `2px solid ${step === s ? theme.accent : BASE.panelBd}`, background: step === s ? theme.accent + "15" : "white", color: step === s ? theme.accent : BASE.inkMute, fontWeight: 700, fontSize: 12, cursor: "pointer" } }, l)
+    React.createElement("button", { key: s, onClick: () => setStep(s), style: { flex: 1, padding: "8px", borderRadius: 8, border: `2px solid ${step === s ? theme.accent : BASE.panelBd}`, background: step === s ? theme.accent + "22" : "#22232F", color: step === s ? theme.accent : "#7A7F99", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, l)
     )
     ),
 
@@ -2355,7 +2355,7 @@ function AlertReviewModal({ alert, onClose, onRegister, km, theme, vehicleType }
     React.createElement("div", { style: { marginBottom: 16 } }, /*#__PURE__*/
     React.createElement("div", { style: { fontSize: 9, letterSpacing: 3, color: theme.accent, fontFamily: "monospace", marginBottom: 10 } }, "COM FER LA REVISIÓ — PASSOS"),
     alert.tips.map((t, i) => /*#__PURE__*/
-    React.createElement("div", { key: i, style: { display: "flex", gap: 12, padding: "10px 12px", marginBottom: 8, background: "white", borderRadius: 8, border: `1px solid ${BASE.panelBd}`, borderLeft: `3px solid ${theme.accent}` } }, /*#__PURE__*/
+    React.createElement("div", { key: i, style: { display: "flex", gap: 12, padding: "10px 12px", marginBottom: 8, background: "#22232F", borderRadius: 8, border: `1px solid #2E2E3E`, borderLeft: `3px solid ${theme.accent}` } }, /*#__PURE__*/
     React.createElement("div", { style: { width: 24, height: 24, borderRadius: "50%", background: theme.accent, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, flexShrink: 0 } }, i + 1), /*#__PURE__*/
     React.createElement("div", null, /*#__PURE__*/
     React.createElement("div", { style: { fontSize: 10, color: theme.accent, fontFamily: "monospace", letterSpacing: 1, marginBottom: 2 } }, t.iv), /*#__PURE__*/
@@ -2476,10 +2476,10 @@ function AlertsTab({ alerts, theme, setIvs, km, vehicleType }) {
     const pct = a.pct !== undefined ? Math.min(100, Math.max(0, a.pct)) : (a.sev === "urgent" ? 100 : 75);
     return (/*#__PURE__*/
       React.createElement("div", { onClick: () => isClickable && setSelectedAlert(a),
-        style: { background: "white", border: `1px solid ${BASE.panelBd}`, borderLeft: `5px solid ${color}`, borderRadius: 8, padding: "13px 15px", marginBottom: 10, display: "flex", gap: 12, alignItems: "flex-start", cursor: isClickable ? "pointer" : "default", transition: "box-shadow .15s", boxShadow: "0 1px 4px rgba(0,0,0,.05)" } }, /*#__PURE__*/
+        style: { background: "#1A1A22", border: `1px solid ${BASE.panelBd}`, borderLeft: `5px solid ${color}`, borderRadius: 8, padding: "13px 15px", marginBottom: 10, display: "flex", gap: 12, alignItems: "flex-start", cursor: isClickable ? "pointer" : "default", transition: "box-shadow .15s", boxShadow: "0 1px 4px rgba(0,0,0,.05)" } }, /*#__PURE__*/
       React.createElement("span", { style: { fontSize: 22, flexShrink: 0 } }, a.icon), /*#__PURE__*/
       React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /*#__PURE__*/
-      React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: a.sev === "urgent" ? "#C53030" : "#92600a" } }, a.title), /*#__PURE__*/
+      React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: a.sev === "urgent" ? "#F87171" : "#F5A623" } }, a.title), /*#__PURE__*/
       React.createElement("div", { style: { fontSize: 12, color: BASE.inkMute, marginTop: 2 } }, a.desc),
       isClickable && /*#__PURE__*/
       React.createElement("div", { style: { display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" } }, /*#__PURE__*/
