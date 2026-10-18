@@ -2115,15 +2115,26 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
       const sysPrompt = ["Ets un expert mecànic especialista en " + (vehicle.name || theme.name) + ".", "Respon sempre en català. Sigues precís i cita el document font quan puguis.", "Vehicle: " + (vehicle.name || "") + " | Any: " + (vehicle.year || "") + " | Motor: " + (vehicle.engine || "") + " | Km: " + km.toLocaleString(), dossier ? "Notes del propietari: " + dossier : "", ivSummary ? "Últimes intervencions: " + ivSummary : "", files.length > 0 ? "Tens accés als fragments dels documents tècnics indexats." : ""].filter(Boolean).join("\n");
       const histMessages = history.slice(-6).map(h => ({ role: h.role === "bot" ? "assistant" : "user", content: h.content }));
       const userMessage = t + contextFromPDFs;
-      // Prova primer llama-3.3-70b-versatile, fallback a llama-3.1-8b-instant si no hi ha accés
-      const GROQ_MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
+      // Models disponibles per compte free de Groq (ordre de preferència)
+      // qwen3.8-27b: millor model de xat disponible al compte free
+      // llama-3.3-70b-versatile / llama-3.1-8b-instant: només comptes amb accés Llama
+      const GROQ_MODELS = [
+        "qwen/qwen3.8-27b",
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "llama3-70b-8192",
+        "llama3-8b-8192",
+        "gemma2-9b-it"
+      ];
       let resp = null;
       for (const modelId of GROQ_MODELS) {
         const body = { model: modelId, messages: [{ role: "system", content: sysPrompt }, ...histMessages, { role: "user", content: userMessage }], max_tokens: 8192, temperature: 0.2 };
         resp = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + config.groqKey }, body: JSON.stringify(body) });
         if (resp.ok) break;
         const errData = await resp.clone().json().catch(() => ({}));
-        if (!errData?.error?.message?.includes("does not exist")) break; // error diferent, no reintentis
+        const errMsg = errData?.error?.message || "";
+        // Continua provant si és error de model no disponible; atura si és error de clau o altre
+        if (!errMsg.includes("does not exist") && !errMsg.includes("model_not_found") && !errMsg.includes("not have access")) break;
       }
       const data = await resp.json();
       if (!resp.ok) throw new Error((data.error && data.error.message) || JSON.stringify(data).slice(0,200));
