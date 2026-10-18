@@ -2128,7 +2128,7 @@ function ChatbotTab({ config, setConfig, vehicle, km, ivs, tree, setTree, theme,
       ];
       let resp = null;
       for (const modelId of GROQ_MODELS) {
-        const body = { model: modelId, messages: [{ role: "system", content: sysPrompt }, ...histMessages, { role: "user", content: userMessage }], max_tokens: 8192, temperature: 0.2 };
+        const body = { model: modelId, messages: [{ role: "system", content: sysPrompt }, ...histMessages, { role: "user", content: userMessage }], max_tokens: 900, temperature: 0.2 };
         resp = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + config.groqKey }, body: JSON.stringify(body) });
         if (resp.ok) break;
         const errData = await resp.clone().json().catch(() => ({}));
